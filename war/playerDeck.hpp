@@ -2,15 +2,19 @@
 #include "card.hpp"
 #include <vector>
 #include <algorithm>
+#include <random>
+#include <chrono>
 #pragma once
 
-class Deck
+class playerDeck
 {
   public:
-    Deck(std::vector<Card> stdDeck); //constructor
+    playerDeck(std::vector<Card>);
     void deckShuffle();
     Card cardReveal();
+    void addCard(Card);
+    bool removeCard();
   private:
     int availableCards;
-    std::vector<Card> playerDeck;
+    std::vector<Card> Deck;
 };
