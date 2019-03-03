@@ -41,8 +41,8 @@ void Grid::swap(piece p1,piece p2)
   pieceGrid[p2.row][p2.col]=p2;
 }
 
-//returns the selected piece
-piece Grid::returnPiece(int x, int y)
+//returns a reference to the selected piece
+piece& Grid::returnPiece(int x, int y)
 {
   return pieceGrid[x][y];
 }

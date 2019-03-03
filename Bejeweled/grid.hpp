@@ -9,8 +9,8 @@ class Grid
     Grid(int ,int);
     void fillGrid(int);
     void swap(piece, piece);
-    piece returnPiece(int, int);
+    piece& returnPiece(int, int);
 
   private:
     std::vector< std::vector<piece> > pieceGrid;
-}
+};

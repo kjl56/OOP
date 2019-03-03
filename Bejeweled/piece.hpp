@@ -9,3 +9,14 @@ struct piece
     alpha=255;
   }
 };
+
+//operator overloads
+inline bool operator==(const piece& p1, const piece& p2)
+{
+  return p1.kind == p2.kind;
+}
+
+inline bool operator!=(const piece& p1, const piece& p2)
+{
+  return !(p1 == p2);
+}

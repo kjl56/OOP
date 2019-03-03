@@ -64,7 +64,7 @@ int main()
       y=pos.y/ts+1;
       if (abs(x-x0)+abs(y-y0)==1)
       {
-        grid.swap(grid.returnPiece(x0, y0), grid.returnPiece(x, y));
+        grid.swap(grid.returnPiece(y0, x0), grid.returnPiece(y, x));
         //swap(grid[y0][x0],grid[y][x]);
         isSwap=1; click=0;
       }
@@ -75,10 +75,29 @@ int main()
     for(int i=1;i<=8;i++)
       for(int j=1;j<=8;j++)
       {
-        if ()
-          if ()
-            for ()
-              
+        if (grid.returnPiece(i, j) == grid.returnPiece(i+1, j))
+        {
+          if (grid.returnPiece(i, j) == grid.returnPiece(i-1, j))
+          {
+            for (int n = -1; n <= 1; n++)
+            {
+              piece &tempPiece = grid.returnPiece(i+n, j);
+              tempPiece.match++;
+            }
+          }
+        }
+        if (grid.returnPiece(i, j) == grid.returnPiece(i, j+1))
+        {
+          if (grid.returnPiece(i, j) == grid.returnPiece(i, j-1))
+          {
+            for (int n = -1; n <= 1; n++)
+            {
+              piece &tempPiece = grid.returnPiece(i, j+n);
+              tempPiece.match++;
+            }
+          }
+        }
+
       /*if (grid[i][j].kind==grid[i+1][j].kind)
           if (grid[i][j].kind==grid[i-1][j].kind)
             for(int n=-1;n<=1;n++) 
@@ -95,7 +114,8 @@ int main()
     for (int i=1;i<=8;i++)
       for (int j=1;j<=8;j++)
       {
-        piece &p = grid[i][j];
+        piece &p = grid.returnPiece(i, j);
+        //piece &p = grid[i][j];
         int dx,dy;
         for(int n=0;n<4;n++)   // 4 - speed
         {
@@ -113,50 +133,94 @@ int main()
     //Deleting amimation
     if (!isMoving)
       for (int i=1;i<=8;i++)
+      {
         for (int j=1;j<=8;j++)
-          if (grid[i][j].match) 
-            if (grid[i][j].alpha>10) 
+        {
+          piece &tempPiece = grid.returnPiece(i, j);
+          if (tempPiece.match)
+          {
+            if (tempPiece.alpha > 10)
             {
-              grid[i][j].alpha-=10; 
-              isMoving=true;
+              tempPiece.alpha -= 10;
+              isMoving = true;
             }
+          }
+          /*if (grid[i][j].match) 
+              if (grid[i][j].alpha>10) 
+              {
+                grid[i][j].alpha-=10; 
+                isMoving=true;
+              }*/
+        }
+      }
 
     //Get score
     int score=0;
     for (int i=1;i<=8;i++)
+    {
       for (int j=1;j<=8;j++)
-        score+=grid[i][j].match;
+      {
+        piece &tempPiece = grid.returnPiece(i, j);
+        score += tempPiece.match;
+        //score+=grid[i][j].match;
+      }
+    }
 
     //Second swap if no match
     if (isSwap && !isMoving)
     {
       if (!score) 
-        swap(grid[y0][x0],grid[y][x]);
+      {
+        grid.swap(grid.returnPiece(y0, x0), grid.returnPiece(y, x));
+        //swap(grid[y0][x0],grid[y][x]);
+      }
       isSwap=0;
     }
 
     //Update grid
     if (!isMoving)
     {
-      for(int i=8;i>0;i--)
-        for(int j=1;j<=8;j++)
-          if (grid[i][j].match)
-           for(int n=i;n>0;n--)
-            if (!grid[n][j].match) 
-            {
-              swap(grid[n][j],grid[i][j]); 
-              break;
-            };
-
-      for(int j=1;j<=8;j++)
-        for(int i=8,n=0;i>0;i--)
-          if (grid[i][j].match)
+      for(int i = 8; i > 0; i--)
+      {
+        for(int j = 1; j <= 8; j++)
+        {
+          piece &tempPiece = grid.returnPiece(i, j);
+          if (tempPiece.match)
+          //if (grid[i][j].match)
           {
-            grid[i][j].kind = rand()%7;
-            grid[i][j].y = -ts*n++;
-            grid[i][j].match=0;
-            grid[i][j].alpha = 255;
+            for(int n = i; n > 0; n--)
+            {
+              if (!tempPiece.match)
+              //if (!grid[n][j].match) 
+              {
+                grid.swap(grid.returnPiece(n, j), grid.returnPiece(i, j));
+                //swap(grid[n][j],grid[i][j]); 
+                break;
+              };
+            }
           }
+        }
+      }
+
+      for(int j = 1; j <= 8; j++)
+      {
+        for(int i = 8, n = 0; i > 0; i--)
+        {
+          piece &tempPiece = grid.returnPiece(i, j);
+          if (tempPiece.match)
+          //if (grid[i][j].match)
+          {
+            tempPiece.kind = rand()%7;
+            //grid[i][j].kind = rand()%7;
+            tempPiece.y = -ts*n++;
+            //grid[i][j].y = -ts*n++;
+            tempPiece.match = 0;
+            //grid[i][j].match=0;
+            tempPiece.alpha = 255;
+            //grid[i][j].alpha = 255;
+          }
+        }
+      }
     }
 
 
@@ -166,7 +230,8 @@ int main()
 	  for (int i=1;i<=8;i++)
       for (int j=1;j<=8;j++)
       {
-        piece p = grid[i][j];
+        piece &p = grid.returnPiece(i, j);
+        //piece p = grid[i][j];
         gems.setTextureRect( IntRect(p.kind*49,0,49,49));
         gems.setColor(Color(255,255,255,p.alpha));
         gems.setPosition(p.x,p.y);
