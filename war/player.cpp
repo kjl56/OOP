@@ -1,7 +1,8 @@
 #include "player.hpp"
 //default constructor
-player::player(Deck stdDeck, int i):
-  playerDeck(stdDeck, i){
+player::player(Deck stdDeck)
+{
+  playerDeck = stdDeck;
 }
 
 //shuffles the player's deck
@@ -42,4 +43,12 @@ Card player::giveCardAway()
   Card tempCard = playerHand.back();
   playerHand.pop_back();
   return tempCard;
+}
+
+//returns true if playerHand is empty, false if else
+bool player::isHandEmpty()
+{
+  if (playerHand.empty())
+    return true;
+  return false;
 }
