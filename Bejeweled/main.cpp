@@ -13,11 +13,13 @@ int main()
   RenderWindow app(VideoMode(740,480), "Match-3 Game!");
   app.setFramerateLimit(60);
 
-  Texture t1,t2;
+  Texture t1,t2,t3;
   t1.loadFromFile("images/background.png");
   t2.loadFromFile("images/gems.png");
+  t3.loadFromFile("images/cursor.png");
 
-  Sprite background(t1), gems(t2);
+  Sprite background(t1), gems(t2), cursor(t3);
+  cursor.setColor(Color::Transparent);
 
   grid.fillGrid(ts);
 
@@ -45,6 +47,8 @@ int main()
     {
       x0=pos.x/ts+1;
       y0=pos.y/ts+1;
+      cursor.setPosition(x0*ts + offset.x-ts, y0*ts + offset.y-ts);
+      cursor.setColor(Color::White);
     }
     if (click==2)
     {
@@ -52,6 +56,7 @@ int main()
       y=pos.y/ts+1;
       if (abs(x-x0)+abs(y-y0)==1)
       {
+        cursor.setColor(Color::Transparent);
         grid.swap(grid.returnPiece(y0, x0), grid.returnPiece(y, x));
         isSwap=1; click=0;
       }
@@ -176,7 +181,21 @@ int main()
         app.draw(gems);
       }
 
+    app.draw(cursor);
+
     app.display();
   }
   return 0;
 }
+
+/*
+stuff to do
+-add bomb piece
+-make custom grids
+-game should keep track of matches, not the pieces themselves
+-grid should exclusively keep track of where pieces are, not the pieces themselves
++add selector sprite
+-fix out of bounds bug that crashes game when you click to switch a piece to the right of the board
+-fix window resize bug (pieces cant be properly clicked when window is resized(probably due to 
+ tilesize and offset not being updated))
+*/
