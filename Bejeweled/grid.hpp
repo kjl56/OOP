@@ -10,6 +10,7 @@ class Grid
     void fillGrid(int); //fills entire grid with random pieces
     void swap(piece, piece); //swaps two pieces on the grid
     piece& returnPiece(int, int); //returns reference to selected piece
+    void updateGrid(int);//updates grid pieces after matches have been made
 
   private:
     std::vector< std::vector<piece> > pieceGrid;

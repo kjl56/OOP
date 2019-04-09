@@ -21,7 +21,10 @@ int main()
   Sprite background(t1), gems(t2), cursor(t3);
   cursor.setColor(Color::Transparent);
 
-  grid.fillGrid(ts);
+   grid.fillGrid(ts);
+
+  //game will keep track of which pieces are matched instead of the pieces themselves
+  std::vector<std::pair<int, int>> matchingPieces;
 
   int x0,y0,x,y; int click=0; Vector2i pos;
   bool isSwap=false, isMoving=false;
@@ -67,6 +70,17 @@ int main()
     for(int i=1;i<=8;i++)
       for(int j=1;j<=8;j++)
       {
+        /*
+        //basic idea for a bomb
+        if (grid.returnPiece(i, j) == piece::bomb)
+          for (int n = -1; n <= 1; ++n)
+            for (int x = -1; x <= 1; ++x)
+            {
+              piece &tempPiece = grid.returnPiece(i+n, j+x);
+              tempPiece.match++;
+            }
+        */
+        //second idea: make stack, put matched pieces on stack, pop them off when removed from game
         if (grid.returnPiece(i, j) == grid.returnPiece(i+1, j))
           if (grid.returnPiece(i, j) == grid.returnPiece(i-1, j))
             for (int n = -1; n <= 1; n++)
@@ -137,34 +151,7 @@ int main()
     //Update grid
     if (!isMoving)
     {
-      for(int i = 8; i > 0; i--)
-        for(int j = 1; j <= 8; j++)
-        {
-          piece &tempPiece = grid.returnPiece(i, j);
-          if (tempPiece.match)
-            for(int n = i; n > 0; n--)
-            {
-              piece &tempPiece2 = grid.returnPiece(n, j);
-              if (!tempPiece2.match)
-              {
-                grid.swap(grid.returnPiece(n, j), grid.returnPiece(i, j));
-                break;
-              };
-            }
-        }
-
-      for(int j = 1; j <= 8; j++)
-        for(int i = 8, n = 0; i > 0; i--)
-        {
-          piece &tempPiece = grid.returnPiece(i, j);
-          if (tempPiece.match)
-          {
-            tempPiece.kind = rand()%7;
-            tempPiece.y = -ts*n++;
-            tempPiece.match = 0;
-            tempPiece.alpha = 255;
-          }
-        }
+      grid.updateGrid(ts);
     }
 
     //////draw///////

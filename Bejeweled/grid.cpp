@@ -46,3 +46,33 @@ piece& Grid::returnPiece(int x, int y)
 {
   return pieceGrid[x][y];
 }
+
+//updates grid pieces after matches have been made
+void Grid::updateGrid(int ts)
+{
+  for(int i = 8; i > 0; i--)
+    for(int j = 1; j <= 8; j++)
+    {
+      if (pieceGrid[i][j].match)
+        for(int n = i; n > 0; n--)
+        {
+          if (!pieceGrid[n][j].match)
+          {
+            swap(pieceGrid[n][j], pieceGrid[i][j]);
+            break;
+          };
+        }
+    }
+
+  for(int j = 1; j <= 8; j++)
+    for(int i = 8, n = 0; i > 0; i--)
+    {
+      if (pieceGrid[i][j].match)
+      {
+        pieceGrid[i][j].kind = rand()%7;
+        pieceGrid[i][j].y = -ts*n++;
+        pieceGrid[i][j].match = 0;
+        pieceGrid[i][j].alpha = 255;
+      }
+    }
+}
