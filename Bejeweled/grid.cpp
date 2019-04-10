@@ -64,12 +64,28 @@ void Grid::updateGrid(int ts)
         }
     }
 
+  //makes new random pieces
   for(int j = 1; j <= 8; j++)
     for(int i = 8, n = 0; i > 0; i--)
     {
       if (pieceGrid[i][j].match)
       {
-        pieceGrid[i][j].kind = rand()%7;
+        int randNum = rand()%61;
+        if (randNum < 10)//0-9
+          pieceGrid[i][j].kind = 0;
+        else if (randNum < 20)//10-19
+          pieceGrid[i][j].kind = 1;
+        else if (randNum < 30)//20-29
+          pieceGrid[i][j].kind = 2;
+        else if (randNum < 40)//30-39
+          pieceGrid[i][j].kind = 3;
+        else if (randNum < 50)//40-49
+          pieceGrid[i][j].kind = 4;
+        else if (randNum < 60)//50-59
+          pieceGrid[i][j].kind = 5;
+        else//60
+          pieceGrid[i][j].kind = 6;//bomb
+        
         pieceGrid[i][j].y = -ts*n++;
         pieceGrid[i][j].match = 0;
         pieceGrid[i][j].alpha = 255;
