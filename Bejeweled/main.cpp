@@ -8,7 +8,8 @@ Vector2i offset(48,24);
 
 int main()
 {
-  Grid grid(10, 10);
+  int gridX = 10, gridY = 10;
+  Grid grid(gridX, gridY);
 
   RenderWindow app(VideoMode(740,480), "Match-3 Game!");
   app.setFramerateLimit(60);
@@ -21,10 +22,10 @@ int main()
   Sprite background(t1), gems(t2), cursor(t3);
   cursor.setColor(Color::Transparent);
 
-   grid.fillGrid(ts);
-
+  grid.fillGrid(ts);
+  
   //game will keep track of which pieces are matched instead of the pieces themselves
-  std::vector<std::pair<int, int>> matchingPieces;
+  //std::vector<std::pair<int, int>> matchingPieces;
 
   int x0,y0,x,y; int click=0; Vector2i pos;
   bool isSwap=false, isMoving=false;
@@ -57,7 +58,23 @@ int main()
     {
       x=pos.x/ts+1;
       y=pos.y/ts+1;
-      if (abs(x-x0)+abs(y-y0)==1)
+      if (abs(x-x0)+abs(y-y0)==0)//if piece was double clicked
+      {
+        click = 1;
+        piece &p = grid.returnPiece(y0, x0);
+        if ( p.kind == 6)//check if it is a bomb
+        {
+          for (int n = -1; n <= 1; ++n)
+            for (int x = -1; x <= 1; ++x)
+            {
+              piece &tempPiece = grid.returnPiece(y0+n, x0+x);
+              tempPiece.match++;
+            }
+          click = 0;
+          cursor.setColor(Color::Transparent);
+        }
+      }
+      else if (abs(x-x0)+abs(y-y0)==1)
       {
         cursor.setColor(Color::Transparent);
         grid.swap(grid.returnPiece(y0, x0), grid.returnPiece(y, x));
