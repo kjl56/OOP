@@ -6,6 +6,84 @@ using namespace sf;
 int ts = 54; //tile size
 Vector2i offset(48,24);
 
+struct game_state 
+{
+  int ts = 54; //tile size
+  Vector2i offset(int i= 48,int j= 24);
+  int x0,y0,x,y; int click=0; Vector2i pos;
+  bool isSwap=false, isMoving=false;
+};
+
+struct event_listener {
+    virtual void on_close(RenderWindow& w) { w.close(); }
+    virtual void on_mouse_press_left(game_state& state) {
+      if (!state.isSwap && !state.isMoving) state.click++;
+      state.pos = Mouse::getPosition(window) - state.offset;
+    }
+};
+
+struct event_source 
+{
+  event_source (RenderWindow& w)
+    : window(w) {
+  }
+
+  void listen(event_listener& l)
+  {
+    listeners.push_back(&l);
+  }
+
+  template<typename F>
+  void notify(F fn)
+  {
+    for (event_listener* l : listeners)
+      fn(l);    
+  }
+
+  void process (Event const& e, game_state& state)
+  {
+    switch (e.type)
+    {
+      case Event::Closed :
+        return notify( [e] (event_listener* l) { l->on_close(window); } );
+        //window.close();
+        //break;
+      case Event::MouseButtonPressed :
+        if (e.mouseButton.button == Mouse::Left)
+        {
+          return notify( [e] (event_listener* l) { l->on_mouse_press_left(state); } );
+          //if (!state.isSwap && !state.isMoving) state.click++;
+          //state.pos = Mouse::getPosition(window) - state.offset;
+        }
+        //break;
+      default :
+        break;
+    }
+
+    /*if (e.type == Event::Closed)
+      app.close();
+        
+    if (e.type == Event::MouseButtonPressed)
+      if (e.mouseButton.button == Mouse::Left)
+      {
+        if (!isSwap && !isMoving) click++;
+        pos = Mouse::getPosition(app)-offset;
+      }*/
+  }
+  
+  void poll (game_state& state)
+  {
+    Event e;
+    while (window.pollEvent(e))
+    {
+      process(e, state);
+    }
+  }
+
+  RenderWindow& window;
+  std::vector<event_listener*> listeners;
+};
+
 int main()
 {
   int gridX = 10, gridY = 10;
@@ -13,6 +91,12 @@ int main()
 
   RenderWindow app(VideoMode(740,480), "Match-3 Game!");
   app.setFramerateLimit(60);
+
+  event_source events(app);
+  event_listener list;
+  events.listen(list);
+
+  game_state state;
 
   Texture t1,t2,t3;
   t1.loadFromFile("images/background.png");
@@ -32,7 +116,12 @@ int main()
 
   while (app.isOpen())
   {
-    Event e;
+    //makes adjustments so resizing window doesnt mess up clicking
+    Vector2u windowSize = app.getSize();
+    ts *= windowSize.y/480;
+
+    events.poll(state);
+    /*Event e;
     while (app.pollEvent(e))
     {
       if (e.type == Event::Closed)
@@ -44,7 +133,7 @@ int main()
 				  if (!isSwap && !isMoving) click++;
 				  pos = Mouse::getPosition(app)-offset;
         }
-    }
+    }*/
 	
     // mouse click
     if (click==1)
@@ -87,17 +176,7 @@ int main()
     for(int i=1;i<=8;i++)
       for(int j=1;j<=8;j++)
       {
-        /*
-        //basic idea for a bomb
-        if (grid.returnPiece(i, j) == piece::bomb)
-          for (int n = -1; n <= 1; ++n)
-            for (int x = -1; x <= 1; ++x)
-            {
-              piece &tempPiece = grid.returnPiece(i+n, j+x);
-              tempPiece.match++;
-            }
-        */
-        //second idea: make stack, put matched pieces on stack, pop them off when removed from game
+        //idea: make stack, put matched pieces on stack, pop them off when removed from game
         if (grid.returnPiece(i, j) == grid.returnPiece(i+1, j))
           if (grid.returnPiece(i, j) == grid.returnPiece(i-1, j))
             for (int n = -1; n <= 1; n++)
@@ -134,7 +213,7 @@ int main()
           isMoving=1;
       }
 
-    //Deleting amimation
+    //Deleting animation
     if (!isMoving)
       for (int i=1;i<=8;i++)
         for (int j=1;j<=8;j++)
@@ -194,12 +273,9 @@ int main()
 
 /*
 stuff to do
--add bomb piece
 -make custom grids
 -game should keep track of matches, not the pieces themselves
 -grid should exclusively keep track of where pieces are, not the pieces themselves
-+add selector sprite
 -fix out of bounds bug that crashes game when you click to switch a piece to the right of the board
--fix window resize bug (pieces cant be properly clicked when window is resized(probably due to 
- tilesize and offset not being updated))
+-fix window resize bug (pieces cant be properly clicked when window is resized)
 */
